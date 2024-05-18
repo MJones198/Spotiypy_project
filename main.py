@@ -1,3 +1,17 @@
+"""
+This Flask web application provides a simple interface for users to view their Spotify playlists.
+
+The application uses the Spotipy library to authenticate with the Spotify API and retrieve the user's playlists. The authentication process is handled using the SpotifyOAuth class, which provides a way to obtain an access token from the Spotify API.
+
+The main routes in the application are:
+
+- `home()`: Checks if the user has a valid access token, and if not, redirects the user to the Spotify authorization page.
+- `callback()`: Handles the callback from the Spotify authorization page, obtaining an access token and redirecting the user to the `get_playlists()` route.
+- `get_playlists()`: Retrieves the user's playlists from the Spotify API and displays them on the web page.
+- `logout()`: Clears the user's session and redirects the user to the home page.
+
+The application uses the Flask-Session cache handler to store the user's access token, which allows the user to remain authenticated across multiple requests.
+"""
 import os
 from flask import Flask, session, url_for, request ,redirect
 from spotipy import Spotify
@@ -8,10 +22,24 @@ from spotipy.cache_handler import FlaskSessionCacheHandler
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(64)
 
-client_id = '6fc0fc26a6c248c38b9e4786720e857e'
-client_secret = '8796ea69f1c04a99854113d8af52399a'
+"""
+Configures the Spotify OAuth2 authentication flow for the application.
+
+The `client_id` and `client_secret` are the unique identifiers for the Spotify application.
+The `redirect_uri` is the URL that Spotify will redirect the user to after they have authenticated.
+The `scope` parameter specifies the permissions that the application is requesting from the user.
+The `cache_handler` is used to store the user's access token and refresh token, so that the user
+doesn't have to re-authenticate every time they use the application.
+The `sp_oauth` object is used to manage the OAuth2 flow, and the `sp` object is used to make
+API calls to Spotify on behalf of the authenticated user.
+"""
+
+client_id = os.environ.get('Client_ID_Spot')
+client_secret = os.environ.get('Client_Secret_Spot')
+
+
 redirect_uri = 'http://localhost:5000/callback'
-# sep scopes with ,
+
 scope = 'playlist-read-private'
 
 cache_handler= FlaskSessionCacheHandler(session)
